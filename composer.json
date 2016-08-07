@@ -1,0 +1,28 @@
+{
+    "name": "sergeymakinen/yii2-slack-log",
+    "homepage": "https://github.com/sergeymakinen/yii2-slack-log",
+    "description": "Pretty Slack log target for Yii 2",
+    "keywords": ["yii2-slack-log", "yii2", "yii", "slack", "log", "logging"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/sergeymakinen/yii2-slack-log/issues?state=open",
+        "source": "https://github.com/sergeymakinen/yii2-slack-log"
+    },
+    "authors": [
+        {
+            "name": "Sergey Makinen",
+            "email": "sergey@makinen.ru",
+            "homepage": "https://makinen.ru"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "2.0.*"
+    },
+    "autoload": {
+        "classmap": [
+            "SlackTarget.php"
+        ]
+    }
+}
