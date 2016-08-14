@@ -81,14 +81,25 @@ class SlackTarget extends Target
         if (isset($this->channel)) {
             $payload['channel'] = $this->channel;
         }
-        $context  = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json; charset=UTF-8\r\n",
-                'content' => Json::encode($payload)
-            ]
-        ]);
-        @file_get_contents($this->webhookUrl, false, $context);
+        if (extension_loaded('curl')) {
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json; charset=UTF-8']);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, Json::encode($payload));
+            curl_setopt($curl, CURLOPT_URL, $this->webhookUrl);
+            curl_exec($curl);
+            curl_close($curl);
+        } else {
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/json; charset=UTF-8\r\n",
+                    'content' => Json::encode($payload)
+                ]
+            ]);
+            @file_get_contents($this->webhookUrl, false, $context);
+        }
     }
 
     /**
