@@ -1,4 +1,11 @@
 <?php
+/**
+ * Slack log target for Yii 2
+ *
+ * @see       https://github.com/sergeymakinen/yii2-slack-log
+ * @copyright Copyright (c) 2016 Sergey Makinen (https://makinen.ru)
+ * @license   https://github.com/sergeymakinen/yii2-slack-log/blob/master/LICENSE The MIT License
+ */
 
 namespace sergeymakinen\log;
 
@@ -156,17 +163,17 @@ class SlackTarget extends Target
         if (isset(\Yii::$app)) {
             if (isset($_SERVER['argv'])) {
                 $attachment['author_name'] = implode(' ', $_SERVER['argv']);
-            } elseif (\Yii::$app->request instanceof Request) {
+            } elseif (\Yii::$app->getRequest() instanceof Request) {
                 $attachment['author_name'] = Url::current([], true);
                 $attachment['author_link'] = $attachment['author_name'];
                 $attachment['fields'][] = [
                     'title' => 'User IP',
-                    'value' => \Yii::$app->request->userIP,
+                    'value' => \Yii::$app->getRequest()->getUserIP(),
                     'short' => true,
                 ];
             }
-            if (\Yii::$app->has('user', true) && isset(\Yii::$app->user)) {
-                $user = \Yii::$app->user->getIdentity(false);
+            if (\Yii::$app->has('user', true) && !is_null(\Yii::$app->getUser())) {
+                $user = \Yii::$app->getUser()->getIdentity(false);
                 if (isset($user)) {
                     $attachment['fields'][] = [
                         'title' => 'User ID',
@@ -175,11 +182,11 @@ class SlackTarget extends Target
                     ];
                 }
             }
-            if (\Yii::$app->has('session', true) && isset(\Yii::$app->session)) {
-                if (\Yii::$app->session->isActive) {
+            if (\Yii::$app->has('session', true) && !is_null(\Yii::$app->getSession())) {
+                if (\Yii::$app->getSession()->getIsActive()) {
                     $attachment['fields'][] = [
                         'title' => 'Session ID',
-                        'value' => \Yii::$app->session->id,
+                        'value' => \Yii::$app->getSession()->getId(),
                         'short' => true,
                     ];
                 }
