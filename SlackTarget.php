@@ -76,18 +76,10 @@ class SlackTarget extends Target
             'parse' => 'none',
             'attachments' => array_map([$this, 'formatMessageAttachment'], $this->messages)
         ];
-        if (isset($this->username)) {
-            $payload['username'] = $this->username;
-        }
-        if (isset($this->iconUrl)) {
-            $payload['icon_url'] = $this->iconUrl;
-        }
-        if (isset($this->iconEmoji)) {
-            $payload['icon_emoji'] = $this->iconEmoji;
-        }
-        if (isset($this->channel)) {
-            $payload['channel'] = $this->channel;
-        }
+        $this->copyToPayload($payload, 'username', $this->username);
+        $this->copyToPayload($payload, 'icon_url', $this->iconUrl);
+        $this->copyToPayload($payload, 'icon_emoji', $this->iconEmoji);
+        $this->copyToPayload($payload, 'channel', $this->channel);
         if (extension_loaded('curl')) {
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -105,7 +97,7 @@ class SlackTarget extends Target
                     'content' => Json::encode($payload)
                 ]
             ]);
-            @file_get_contents($this->webhookUrl, false, $context);
+            file_get_contents($this->webhookUrl, false, $context);
         }
     }
 
@@ -153,45 +145,14 @@ class SlackTarget extends Target
                 'text'
             ]
         ];
-        if ($this->prefix !== null) {
+        if (isset($this->prefix)) {
             $attachment['fields'][] = [
                 'title' => 'Prefix',
                 'value' => '`' . static::encodeMessage(call_user_func($this->prefix, $message)) . '`',
                 'short' => true,
             ];
         }
-        if (isset(\Yii::$app)) {
-            if (isset($_SERVER['argv'])) {
-                $attachment['author_name'] = implode(' ', $_SERVER['argv']);
-            } elseif (\Yii::$app->getRequest() instanceof Request) {
-                $attachment['author_name'] = Url::current([], true);
-                $attachment['author_link'] = $attachment['author_name'];
-                $attachment['fields'][] = [
-                    'title' => 'User IP',
-                    'value' => \Yii::$app->getRequest()->getUserIP(),
-                    'short' => true,
-                ];
-            }
-            if (\Yii::$app->has('user', true) && !is_null(\Yii::$app->getUser())) {
-                $user = \Yii::$app->getUser()->getIdentity(false);
-                if (isset($user)) {
-                    $attachment['fields'][] = [
-                        'title' => 'User ID',
-                        'value' => $user->getId(),
-                        'short' => true,
-                    ];
-                }
-            }
-            if (\Yii::$app->has('session', true) && !is_null(\Yii::$app->getSession())) {
-                if (\Yii::$app->getSession()->getIsActive()) {
-                    $attachment['fields'][] = [
-                        'title' => 'Session ID',
-                        'value' => \Yii::$app->getSession()->getId(),
-                        'short' => true,
-                    ];
-                }
-            }
-        }
+        $this->applyApplicationFormatToAttachment($attachment);
         if (isset($this->colors[$level])) {
             $attachment['color'] = $this->colors[$level];
         }
@@ -217,5 +178,64 @@ class SlackTarget extends Target
             ];
         }
         return $attachment;
+    }
+
+    /**
+     * Inserts current application details to the attachment.
+     *
+     * @param array $attachment
+     */
+    private function applyApplicationFormatToAttachment(array &$attachment)
+    {
+        if (!isset(\Yii::$app)) {
+            return;
+        }
+
+        if (\Yii::$app->getRequest() instanceof Request) {
+            $attachment['author_name'] = Url::current([], true);
+            $attachment['author_link'] = $attachment['author_name'];
+            $attachment['fields'][] = [
+                'title' => 'User IP',
+                'value' => \Yii::$app->getRequest()->getUserIP(),
+                'short' => true,
+            ];
+        } else {
+            $attachment['author_name'] = implode(' ', \Yii::$app->getRequest()->getParams());
+        }
+        if (\Yii::$app->has('user', true) && !is_null(\Yii::$app->getUser())) {
+            $user = \Yii::$app->getUser()->getIdentity(false);
+            if (isset($user)) {
+                $attachment['fields'][] = [
+                    'title' => 'User ID',
+                    'value' => $user->getId(),
+                    'short' => true,
+                ];
+            }
+        }
+        if (
+            \Yii::$app->has('session', true)
+            && !is_null(\Yii::$app->getSession())
+            && \Yii::$app->getSession()->getIsActive()
+        ) {
+            $attachment['fields'][] = [
+                'title' => 'Session ID',
+                'value' => \Yii::$app->getSession()->getId(),
+                'short' => true,
+            ];
+        }
+    }
+
+    /**
+     * Copies the value to the payload if the value is set.
+     *
+     * @param array $payload
+     * @param string $name
+     * @param mixed $value
+     */
+    private function copyToPayload(array &$payload, $name, $value)
+    {
+        if (isset($value)) {
+            $payload[$name] = $value;
+        }
     }
 }
