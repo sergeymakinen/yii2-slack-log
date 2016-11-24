@@ -6,6 +6,8 @@ Pretty [Slack](https://slack.com) log target for Yii 2.
 
 [![Code Quality](https://img.shields.io/scrutinizer/g/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://scrutinizer-ci.com/g/sergeymakinen/yii2-slack-log) [![Packagist Version](https://img.shields.io/packagist/v/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://packagist.org/packages/sergeymakinen/yii2-slack-log) [![Total Downloads](https://img.shields.io/packagist/dt/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://packagist.org/packages/sergeymakinen/yii2-slack-log) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/ba92b44d-afd3-463d-9d61-95ac316537af/big.png)](https://insight.sensiolabs.com/projects/ba92b44d-afd3-463d-9d61-95ac316537af)
+
 ## Installation
 
 The preferred way to install this extension is through [composer](https://getcomposer.org/download/).
