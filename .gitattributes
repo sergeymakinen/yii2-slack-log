@@ -5,6 +5,3 @@
 /phpunit.xml.dist export-ignore
 /doc export-ignore
 /tests export-ignore
-
-*.jpg binary
-*.png binary
