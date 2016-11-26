@@ -2,11 +2,11 @@
 
 Pretty [Slack](https://slack.com) log target for Yii 2.
 
-![Screenshot](README.png)
+![Screenshot](docs/README.png)
 
-[![Code Quality](https://img.shields.io/scrutinizer/g/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://scrutinizer-ci.com/g/sergeymakinen/yii2-slack-log) [![Packagist Version](https://img.shields.io/packagist/v/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://packagist.org/packages/sergeymakinen/yii2-slack-log) [![Total Downloads](https://img.shields.io/packagist/dt/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://packagist.org/packages/sergeymakinen/yii2-slack-log) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Code Quality](https://img.shields.io/scrutinizer/g/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://scrutinizer-ci.com/g/sergeymakinen/yii2-slack-log) [![Build Status](https://img.shields.io/travis/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://travis-ci.org/sergeymakinen/yii2-slack-log) [![Code Coverage](https://img.shields.io/codecov/c/github/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://codecov.io/gh/sergeymakinen/yii2-slack-log) [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/ba92b44d-afd3-463d-9d61-95ac316537af.svg?style=flat-square)](https://insight.sensiolabs.com/projects/ba92b44d-afd3-463d-9d61-95ac316537af)
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/ba92b44d-afd3-463d-9d61-95ac316537af/big.png)](https://insight.sensiolabs.com/projects/ba92b44d-afd3-463d-9d61-95ac316537af)
+[![Packagist Version](https://img.shields.io/packagist/v/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://packagist.org/packages/sergeymakinen/yii2-slack-log) [![Total Downloads](https://img.shields.io/packagist/dt/sergeymakinen/yii2-slack-log.svg?style=flat-square)](https://packagist.org/packages/sergeymakinen/yii2-slack-log) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
 ## Installation
 
@@ -38,7 +38,6 @@ Then set the following Yii 2 configuration parameters:
         'targets' => [
             [
                 'class' => 'sergeymakinen\log\SlackTarget',
-                'exportInterval' => 50, // 50 or less is better
                 'webhookUrl' => 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
             ],
         ],
@@ -56,10 +55,8 @@ Sample config:
                 'class' => 'sergeymakinen\log\SlackTarget',
                 'levels' => ['error'],
                 'except' => [
-                    'yii\web\HttpException',
-                    'yii\web\HttpException:404',
+                    'yii\web\HttpException:*',
                 ],
-                'exportInterval' => 50,
                 'enabled' => YII_ENV_PROD,
                 'webhookUrl' => 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
                 'username' => 'Fire Alarm Bot',
