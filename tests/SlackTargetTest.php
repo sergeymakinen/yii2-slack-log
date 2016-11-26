@@ -259,7 +259,10 @@ class SlackTargetTest extends TestCase
             ],
             'author_link' => Url::current([], true),
             'author_name' => Url::current([], true),
-            'text' => new Contains('sergeymakinen\tests\mocks\TestException: bar in'),
+            'text' => new Contains([
+                'sergeymakinen\tests\mocks\TestException',
+                'bar',
+            ]),
         ];
         $this->comparePayload($expected, $attachment);
         $emptyArray = '[]';
