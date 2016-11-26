@@ -26,7 +26,9 @@ class SlackTargetTest extends TestCase
             'attachments' => [
                 [
                     'fallback' => new Contains([
-                        'foo[error][sergeymakinen\tests\SlackTargetTest::testGetPayload] Exception \'sergeymakinen\tests\mocks\TestException\' with message \'Hello &amp; &lt;world&gt; 🌊\'',
+                        'foo[error][sergeymakinen\tests\SlackTargetTest::testGetPayload]',
+                        'sergeymakinen\tests\mocks\TestException',
+                        'Hello &amp; &lt;world&gt; 🌊',
                         '[internal function]: sergeymakinen\tests\SlackTargetTest-&gt;testGetPayload()'
                     ]),
                     'title' => 'Error',
@@ -71,12 +73,15 @@ class SlackTargetTest extends TestCase
                     'author_name' => Url::current([], true),
                     'author_link' => Url::current([], true),
                     'color' => 'danger',
-                    'text' => new Contains('Exception \'sergeymakinen\tests\mocks\TestException\' with message \'Hello &amp; &lt;world&gt; 🌊\''),
+                    'text' => new Contains([
+                        'sergeymakinen\tests\mocks\TestException',
+                        'Hello &amp; &lt;world&gt; 🌊'
+                    ]),
                 ],
                 [
                     'fallback' => new Contains([
                         'foo[info][sergeymakinen\tests\SlackTargetTest::testGetPayload]',
-                        '\'foo\','
+                        'bar'
                     ]),
                     'title' => 'Info',
                     'fields' => [
@@ -119,14 +124,14 @@ class SlackTargetTest extends TestCase
                     ],
                     'author_name' => Url::current([], true),
                     'author_link' => Url::current([], true),
-                    'text' => new Contains('\'foo\','),
+                    'text' => new Contains('bar'),
                 ],
             ],
             'username' => 'Fire Alarm Bot',
             'icon_emoji' => ':poop:',
         ];
         \Yii::error(ErrorHandler::convertExceptionToString(new TestException('Hello & <world> 🌊')), __METHOD__);
-        \Yii::info(['foo'], __METHOD__);
+        \Yii::info(['bar'], __METHOD__);
         \Yii::$app->log->logger->flush();
         $actual = $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'getPayload');
         $this->comparePayload($expected, $actual);
