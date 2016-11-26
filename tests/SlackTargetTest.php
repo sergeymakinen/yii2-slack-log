@@ -203,7 +203,11 @@ class SlackTargetTest extends TestCase
             4 => $trace,
         ]]);
         $expected = [
-            'fallback' => new Contains('foo[trace][category] sergeymakinen\tests\mocks\TestException: bar in'),
+            'fallback' => new Contains([
+                'foo[trace][category]',
+                'sergeymakinen\tests\mocks\TestException',
+                'bar'
+            ]),
             'title' => 'Trace',
             'fields' => [
                 [
