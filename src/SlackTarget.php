@@ -286,7 +286,7 @@ class SlackTarget extends Target
      *
      * @param array $payload
      * @param string $name
-     * @param mixed $value
+     * @param string $value
      */
     private function insertIntoPayload(array &$payload, $name, $value)
     {
