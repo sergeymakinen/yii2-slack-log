@@ -21,5 +21,4 @@ class TestSession extends Session
     {
         return 'session_id';
     }
-
 }

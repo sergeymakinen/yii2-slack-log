@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9fa05dbe872b63ddd11c9176fc3fb1d7",
-    "content-hash": "88786539e2b89f51b9c0b9cf58839ee8",
+    "hash": "b7c43f2f5ac4c816c69f666d78fbded8",
+    "content-hash": "3afa447f357de52bd78dbf9396556869",
     "packages": [
         {
             "name": "bower-asset/jquery",
@@ -187,12 +187,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "0286c523e3519cace01b084c9551534ed8c576a1"
+                "reference": "2b4925e988bf3cc2d3478be495933441eb640b45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/0286c523e3519cace01b084c9551534ed8c576a1",
-                "reference": "0286c523e3519cace01b084c9551534ed8c576a1",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/2b4925e988bf3cc2d3478be495933441eb640b45",
+                "reference": "2b4925e988bf3cc2d3478be495933441eb640b45",
                 "shasum": ""
             },
             "require": {
@@ -273,7 +273,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2016-11-26 20:57:52"
+            "time": "2016-11-27 13:14:08"
         },
         {
             "name": "yiisoft/yii2-composer",
@@ -466,6 +466,60 @@
                 "object graph"
             ],
             "time": "2016-10-31 17:19:45"
+        },
+        {
+            "name": "phar-io/manifest",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phar-io/manifest.git",
+                "reference": "106a1ba8091f094042cb2bd33467f57c904bf646"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phar-io/manifest/zipball/106a1ba8091f094042cb2bd33467f57c904bf646",
+                "reference": "106a1ba8091f094042cb2bd33467f57c904bf646",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-phar": "*",
+                "php": "^5.6 || ^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Arne Blankerts",
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Sebastian Heuer",
+                    "email": "sebastian@phpeople.de",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Sebastian Bergmann",
+                    "email": "sebastian@phpunit.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Component for reading phar.io manifest information from a PHP Archive (PHAR)",
+            "time": "2016-11-28 09:14:44"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -682,12 +736,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "6cba06ff75a1a63a71033e1a01b89056f3af1e8d"
+                "reference": "040ebdac768fb392c8f220a2664eb65cec470ca0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6cba06ff75a1a63a71033e1a01b89056f3af1e8d",
-                "reference": "6cba06ff75a1a63a71033e1a01b89056f3af1e8d",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/040ebdac768fb392c8f220a2664eb65cec470ca0",
+                "reference": "040ebdac768fb392c8f220a2664eb65cec470ca0",
                 "shasum": ""
             },
             "require": {
@@ -737,7 +791,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-11-01 05:06:24"
+            "time": "2016-11-28 15:53:41"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -926,12 +980,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "adf208ee82ab820a26394293f7a1b28ab07235ff"
+                "reference": "d6a070ce7d12e6bb6f5c9ce77c89451a0a3086ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/adf208ee82ab820a26394293f7a1b28ab07235ff",
-                "reference": "adf208ee82ab820a26394293f7a1b28ab07235ff",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d6a070ce7d12e6bb6f5c9ce77c89451a0a3086ee",
+                "reference": "d6a070ce7d12e6bb6f5c9ce77c89451a0a3086ee",
                 "shasum": ""
             },
             "require": {
@@ -941,6 +995,7 @@
                 "ext-mbstring": "*",
                 "ext-xml": "*",
                 "myclabs/deep-copy": "~1.3",
+                "phar-io/manifest": "^1.0@dev",
                 "php": "^5.6 || ^7.0",
                 "phpspec/prophecy": "^1.3.1",
                 "phpunit/php-code-coverage": "^4.0.1",
@@ -1000,20 +1055,20 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-11-23 08:53:43"
+            "time": "2016-11-28 15:16:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "3.4.1",
+            "version": "3.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "45026c8383187ad1dcb14fbfec77dced265b9cfc"
+                "reference": "90a08f5deed5f7ac35463c161f2e8fa0e5652faf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/45026c8383187ad1dcb14fbfec77dced265b9cfc",
-                "reference": "45026c8383187ad1dcb14fbfec77dced265b9cfc",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/90a08f5deed5f7ac35463c161f2e8fa0e5652faf",
+                "reference": "90a08f5deed5f7ac35463c161f2e8fa0e5652faf",
                 "shasum": ""
             },
             "require": {
@@ -1059,7 +1114,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2016-11-19 09:07:46"
+            "time": "2016-11-27 07:52:03"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

@@ -1,6 +1,6 @@
 <?php
 /**
- * Slack log target for Yii 2
+ * Slack log target for Yii 2.
  *
  * @see       https://github.com/sergeymakinen/yii2-slack-log
  * @copyright Copyright (c) 2016 Sergey Makinen (https://makinen.ru)
@@ -29,7 +29,7 @@ class SlackTarget extends Target
      * @since 1.2
      */
     public $httpClient = [
-        'class' => 'yii\httpclient\Client'
+        'class' => 'yii\httpclient\Client',
     ];
 
     /**
@@ -74,7 +74,7 @@ class SlackTarget extends Target
      */
     public $colors = [
         Logger::LEVEL_ERROR => 'danger',
-        Logger::LEVEL_WARNING => 'warning'
+        Logger::LEVEL_WARNING => 'warning',
     ];
 
     /**
@@ -130,7 +130,7 @@ class SlackTarget extends Target
     {
         $payload = [
             'parse' => 'none',
-            'attachments' => array_map([$this, 'formatMessageAttachment'], $this->messages)
+            'attachments' => array_map([$this, 'formatMessageAttachment'], $this->messages),
         ];
         $this->insertIntoPayload($payload, 'username', $this->username);
         $this->insertIntoPayload($payload, 'icon_url', $this->iconUrl);
@@ -156,20 +156,20 @@ class SlackTarget extends Target
                 [
                     'title' => 'Level',
                     'value' => Logger::getLevelName($level),
-                    'short' => true
+                    'short' => true,
                 ],
                 [
                     'title' => 'Category',
                     'value' => '`' . $this->encodeMessage($category) . '`',
-                    'short' => true
-                ]
+                    'short' => true,
+                ],
             ],
             'footer' => static::className(),
             'ts' => (int) round($timestamp),
             'mrkdwn_in' => [
                 'fields',
-                'text'
-            ]
+                'text',
+            ],
         ];
         if (isset($this->prefix)) {
             $attachment['fields'][] = [

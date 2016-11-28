@@ -29,7 +29,7 @@ class SlackTargetTest extends TestCase
                         'foo[error][sergeymakinen\tests\SlackTargetTest::testGetPayload]',
                         'sergeymakinen\tests\mocks\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
-                        '[internal function]: sergeymakinen\tests\SlackTargetTest-&gt;testGetPayload()'
+                        '[internal function]: sergeymakinen\tests\SlackTargetTest-&gt;testGetPayload()',
                     ]),
                     'title' => 'Error',
                     'fields' => [
@@ -75,13 +75,13 @@ class SlackTargetTest extends TestCase
                     'color' => 'danger',
                     'text' => new Contains([
                         'sergeymakinen\tests\mocks\TestException',
-                        'Hello &amp; &lt;world&gt; 🌊'
+                        'Hello &amp; &lt;world&gt; 🌊',
                     ]),
                 ],
                 [
                     'fallback' => new Contains([
                         'foo[info][sergeymakinen\tests\SlackTargetTest::testGetPayload]',
-                        'bar'
+                        'bar',
                     ]),
                     'title' => 'Info',
                     'fields' => [
@@ -171,7 +171,6 @@ class SlackTargetTest extends TestCase
     {
         $attachment = [];
         $this->createConsoleApplication([
-            'charset' => 'UTF-8',
             'components' => [
                 'log' => $this->getLogConfig(),
             ],
@@ -180,17 +179,17 @@ class SlackTargetTest extends TestCase
         $_SERVER['argv'] = [
             'cmd',
             '--arg1',
-            'arg2'
+            'arg2',
         ];
         $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'insertRequestIntoAttachment', [&$attachment]);
         $this->assertEquals([
-            'author_name' => 'cmd --arg1 arg2'
+            'author_name' => 'cmd --arg1 arg2',
         ], $attachment);
 
         $_SERVER['argv'] = null;
         $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'insertRequestIntoAttachment', [&$attachment]);
         $this->assertEquals([
-            'author_name' => ''
+            'author_name' => '',
         ], $attachment);
     }
 
@@ -211,7 +210,7 @@ class SlackTargetTest extends TestCase
             'fallback' => new Contains([
                 'foo[trace][category]',
                 'sergeymakinen\tests\mocks\TestException',
-                'bar'
+                'bar',
             ]),
             'title' => 'Trace',
             'fields' => [
@@ -286,16 +285,15 @@ class SlackTargetTest extends TestCase
         parent::setUp();
         $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
         $this->createWebApplication([
-            'charset' => 'UTF-8',
             'components' => [
                 'log' => $this->getLogConfig(),
                 'session' => [
-                    'class' => 'sergeymakinen\tests\mocks\TestSession'
+                    'class' => 'sergeymakinen\tests\mocks\TestSession',
                 ],
                 'user' => [
                     'class' => 'sergeymakinen\tests\mocks\TestUser',
-                    'identityClass' => 'sergeymakinen\tests\mocks\TestIdentity'
-                ]
+                    'identityClass' => 'sergeymakinen\tests\mocks\TestIdentity',
+                ],
             ],
         ]);
         \Yii::$app->controller = new TestController('test', \Yii::$app);
@@ -326,7 +324,7 @@ class SlackTargetTest extends TestCase
                     'prefix' => function () {
                         return 'foo';
                     },
-                    'logVars' => []
+                    'logVars' => [],
                 ],
             ],
         ];
