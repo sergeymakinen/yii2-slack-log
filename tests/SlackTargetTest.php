@@ -1,12 +1,12 @@
 <?php
 
-namespace sergeymakinen\tests;
+namespace sergeymakinen\tests\log;
 
-use sergeymakinen\tests\mocks\Contains;
-use sergeymakinen\tests\mocks\Matches;
-use sergeymakinen\tests\mocks\TestController;
-use sergeymakinen\tests\mocks\Tester;
-use sergeymakinen\tests\mocks\TestException;
+use sergeymakinen\tests\log\mocks\Contains;
+use sergeymakinen\tests\log\mocks\Matches;
+use sergeymakinen\tests\log\mocks\TestController;
+use sergeymakinen\tests\log\mocks\Tester;
+use sergeymakinen\tests\log\mocks\TestException;
 use yii\base\ErrorHandler;
 use yii\helpers\Url;
 use yii\helpers\VarDumper;
@@ -14,6 +14,34 @@ use yii\log\Logger;
 
 class SlackTargetTest extends TestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
+        $this->createWebApplication([
+            'components' => [
+                'log' => $this->getLogConfig(),
+                'session' => [
+                    'class' => 'sergeymakinen\tests\log\mocks\TestSession',
+                ],
+                'user' => [
+                    'class' => 'sergeymakinen\tests\log\mocks\TestUser',
+                    'identityClass' => 'sergeymakinen\tests\log\mocks\TestIdentity',
+                ],
+            ],
+        ]);
+        \Yii::$app->controller = new TestController('test', \Yii::$app);
+        \Yii::$app->session->isActive;
+        \Yii::$app->user->getIdentity();
+    }
+
+    protected function tearDown()
+    {
+        \Yii::$app->log->targets['slack']->messages = [];
+        \Yii::$app->log->logger->messages = [];
+        parent::tearDown();
+    }
+
     public function testEncodeMessage()
     {
         $this->assertEquals('Hello &amp; &lt;world&gt; 🌊', $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'encodeMessage', ['Hello & <world> 🌊']));
@@ -26,10 +54,10 @@ class SlackTargetTest extends TestCase
             'attachments' => [
                 [
                     'fallback' => new Contains([
-                        'foo[error][sergeymakinen\tests\SlackTargetTest::testGetPayload]',
-                        'sergeymakinen\tests\mocks\TestException',
+                        'foo[error][sergeymakinen\tests\log\SlackTargetTest::testGetPayload]',
+                        'sergeymakinen\tests\log\mocks\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
-                        '[internal function]: sergeymakinen\tests\SlackTargetTest-&gt;testGetPayload()',
+                        '[internal function]: sergeymakinen\tests\log\SlackTargetTest-&gt;testGetPayload()',
                     ]),
                     'title' => 'Error',
                     'fields' => [
@@ -40,7 +68,7 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'Category',
-                            'value' => '`sergeymakinen\tests\SlackTargetTest::testGetPayload`',
+                            'value' => '`sergeymakinen\tests\log\SlackTargetTest::testGetPayload`',
                             'short' => true,
                         ],
                         [
@@ -74,13 +102,13 @@ class SlackTargetTest extends TestCase
                     'author_link' => Url::current([], true),
                     'color' => 'danger',
                     'text' => new Contains([
-                        'sergeymakinen\tests\mocks\TestException',
+                        'sergeymakinen\tests\log\mocks\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
                     ]),
                 ],
                 [
                     'fallback' => new Contains([
-                        'foo[info][sergeymakinen\tests\SlackTargetTest::testGetPayload]',
+                        'foo[info][sergeymakinen\tests\log\SlackTargetTest::testGetPayload]',
                         'bar',
                     ]),
                     'title' => 'Info',
@@ -92,7 +120,7 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'Category',
-                            'value' => '`sergeymakinen\tests\SlackTargetTest::testGetPayload`',
+                            'value' => '`sergeymakinen\tests\log\SlackTargetTest::testGetPayload`',
                             'short' => true,
                         ],
                         [
@@ -140,33 +168,6 @@ class SlackTargetTest extends TestCase
         $this->assertEquals($emptyArray, $actualArray);
     }
 
-    protected function comparePayload(&$expected, &$actual, $actualKey = null)
-    {
-        $actualParent = &$actual;
-        if (isset($actualKey)) {
-            $actual = &$actual[$actualKey];
-        }
-        if (is_array($expected)) {
-            $this->assertInternalType('array', $actual);
-            foreach ($expected as $key => $value) {
-                $this->assertArrayHasKey($key, $actual);
-                $this->comparePayload($expected[$key], $actual, $key);
-            }
-            if (isset($actualKey) && empty($actual)) {
-                unset($actualParent[$actualKey]);
-            }
-        } else {
-            if ($expected instanceof Tester) {
-                $expected->test($this, $actual);
-            } else {
-                $this->assertEquals($expected, $actual);
-            }
-            if (isset($actualParent)) {
-                unset($actualParent[$actualKey]);
-            }
-        }
-    }
-
     public function testInsertRequestIntoAttachment()
     {
         $attachment = [];
@@ -209,7 +210,7 @@ class SlackTargetTest extends TestCase
         $expected = [
             'fallback' => new Contains([
                 'foo[trace][category]',
-                'sergeymakinen\tests\mocks\TestException',
+                'sergeymakinen\tests\log\mocks\TestException',
                 'bar',
             ]),
             'title' => 'Trace',
@@ -259,7 +260,7 @@ class SlackTargetTest extends TestCase
             'author_link' => Url::current([], true),
             'author_name' => Url::current([], true),
             'text' => new Contains([
-                'sergeymakinen\tests\mocks\TestException',
+                'sergeymakinen\tests\log\mocks\TestException',
                 'bar',
             ]),
         ];
@@ -280,32 +281,31 @@ class SlackTargetTest extends TestCase
         \Yii::$app->log->targets['slack']->export();
     }
 
-    protected function setUp()
+    protected function comparePayload(&$expected, &$actual, $actualKey = null)
     {
-        parent::setUp();
-        $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
-        $this->createWebApplication([
-            'components' => [
-                'log' => $this->getLogConfig(),
-                'session' => [
-                    'class' => 'sergeymakinen\tests\mocks\TestSession',
-                ],
-                'user' => [
-                    'class' => 'sergeymakinen\tests\mocks\TestUser',
-                    'identityClass' => 'sergeymakinen\tests\mocks\TestIdentity',
-                ],
-            ],
-        ]);
-        \Yii::$app->controller = new TestController('test', \Yii::$app);
-        \Yii::$app->session->isActive;
-        \Yii::$app->user->getIdentity();
-    }
-
-    protected function tearDown()
-    {
-        \Yii::$app->log->targets['slack']->messages = [];
-        \Yii::$app->log->logger->messages = [];
-        parent::tearDown();
+        $actualParent = &$actual;
+        if (isset($actualKey)) {
+            $actual = &$actual[$actualKey];
+        }
+        if (is_array($expected)) {
+            $this->assertInternalType('array', $actual);
+            foreach ($expected as $key => $value) {
+                $this->assertArrayHasKey($key, $actual);
+                $this->comparePayload($expected[$key], $actual, $key);
+            }
+            if (isset($actualKey) && empty($actual)) {
+                unset($actualParent[$actualKey]);
+            }
+        } else {
+            if ($expected instanceof Tester) {
+                $expected->test($this, $actual);
+            } else {
+                $this->assertEquals($expected, $actual);
+            }
+            if (isset($actualParent)) {
+                unset($actualParent[$actualKey]);
+            }
+        }
     }
 
     protected function getLogConfig()

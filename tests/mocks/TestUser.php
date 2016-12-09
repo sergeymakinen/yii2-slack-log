@@ -1,13 +1,13 @@
 <?php
 
-namespace sergeymakinen\tests\mocks;
+namespace sergeymakinen\tests\log\mocks;
 
 use yii\web\User;
 
 class TestUser extends User
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getIdentity($autoRenew = true)
     {

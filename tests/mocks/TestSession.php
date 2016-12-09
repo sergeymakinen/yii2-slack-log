@@ -1,13 +1,13 @@
 <?php
 
-namespace sergeymakinen\tests\mocks;
+namespace sergeymakinen\tests\log\mocks;
 
 use yii\web\Session;
 
 class TestSession extends Session
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getIsActive()
     {
@@ -15,7 +15,7 @@ class TestSession extends Session
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getId()
     {
