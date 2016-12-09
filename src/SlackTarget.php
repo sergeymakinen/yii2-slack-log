@@ -78,12 +78,12 @@ class SlackTarget extends Target
     ];
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public $exportInterval = 50;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function init()
     {
@@ -92,7 +92,7 @@ class SlackTarget extends Target
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function export()
     {
