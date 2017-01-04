@@ -1,10 +1,10 @@
 <?php
 /**
- * Slack log target for Yii 2.
+ * Slack log target for Yii 2
  *
  * @see       https://github.com/sergeymakinen/yii2-slack-log
- * @copyright Copyright (c) 2016 Sergey Makinen (https://makinen.ru)
- * @license   https://github.com/sergeymakinen/yii2-slack-log/blob/master/LICENSE The MIT License
+ * @copyright Copyright (c) 2016-2017 Sergey Makinen (https://makinen.ru)
+ * @license   https://github.com/sergeymakinen/yii2-slack-log/blob/master/LICENSE MIT License
  */
 
 namespace sergeymakinen\log;
@@ -12,20 +12,15 @@ namespace sergeymakinen\log;
 use yii\base\InvalidValueException;
 use yii\di\Instance;
 use yii\helpers\Json;
-use yii\helpers\Url;
-use yii\helpers\VarDumper;
 use yii\httpclient\Client;
 use yii\log\Logger;
 use yii\log\Target;
-use yii\web\Request;
 
 class SlackTarget extends Target
 {
     /**
-     * Yii HTTP client configuration.
+     * @var Client|array|string Yii HTTP client configuration.
      * This can be a component ID, a configuration array or a Client instance.
-     *
-     * @var Client|array|string
      * @since 1.2
      */
     public $httpClient = [
@@ -33,44 +28,32 @@ class SlackTarget extends Target
     ];
 
     /**
-     * Incoming Webhook URL.
-     *
-     * @var string
+     * @var string incoming webhook URL.
      */
     public $webhookUrl;
 
     /**
-     * Displayed username.
-     *
-     * @var string
+     * @var string displayed username.
      */
     public $username;
 
     /**
-     * Icon URL.
-     *
-     * @var string
+     * @var string icon URL.
      */
     public $iconUrl;
 
     /**
-     * Icon Emoji.
-     *
-     * @var string
+     * @var string icon emoji.
      */
     public $iconEmoji;
 
     /**
-     * Channel or Direct Message.
-     *
-     * @var string
+     * @var string channel or direct message name.
      */
     public $channel;
 
     /**
-     * Colors per a Logger level.
-     *
-     * @var array
+     * @var string[] colors per a logger level.
      */
     public $colors = [
         Logger::LEVEL_ERROR => 'danger',
@@ -78,12 +61,12 @@ class SlackTarget extends Target
     ];
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public $exportInterval = 50;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function init()
     {
@@ -92,7 +75,7 @@ class SlackTarget extends Target
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function export()
     {
@@ -103,26 +86,36 @@ class SlackTarget extends Target
         )->send();
         if (!$response->getIsOk()) {
             throw new InvalidValueException(
-                "Unable to send logs to Slack: {$response->getContent()}", (int) $response->getStatusCode()
+                'Unable to send logs to Slack: ' . $response->getContent(), (int) $response->getStatusCode()
             );
         }
     }
 
     /**
      * Encodes special chars in a message as HTML entities.
-     *
      * @param string $message
-     *
      * @return string
+     * @deprecated 1.3
+     * @see encode()
      */
     protected function encodeMessage($message)
     {
-        return htmlspecialchars($message, ENT_NOQUOTES, 'UTF-8');
+        return $this->encode($message);
+    }
+
+    /**
+     * Encodes special chars in a string as HTML entities.
+     * @param string $string
+     * @return string
+     * @since 1.3
+     */
+    protected function encode($string)
+    {
+        return htmlspecialchars($string, ENT_NOQUOTES, 'UTF-8');
     }
 
     /**
      * Returns a Slack API payload.
-     *
      * @return array
      * @since 1.2
      */
@@ -132,166 +125,96 @@ class SlackTarget extends Target
             'parse' => 'none',
             'attachments' => array_map([$this, 'formatMessageAttachment'], $this->messages),
         ];
-        $this->insertIntoPayload($payload, 'username', $this->username);
-        $this->insertIntoPayload($payload, 'icon_url', $this->iconUrl);
-        $this->insertIntoPayload($payload, 'icon_emoji', $this->iconEmoji);
-        $this->insertIntoPayload($payload, 'channel', $this->channel);
+        $this
+            ->insertIntoPayload($payload, 'username', $this->username)
+            ->insertIntoPayload($payload, 'icon_url', $this->iconUrl)
+            ->insertIntoPayload($payload, 'icon_emoji', $this->iconEmoji)
+            ->insertIntoPayload($payload, 'channel', $this->channel);
         return $payload;
     }
 
     /**
      * Returns a properly formatted message attachment for Slack API.
-     *
      * @param array $message
-     *
      * @return array
      */
     protected function formatMessageAttachment($message)
     {
-        list($text, $level, $category, $timestamp) = $message;
+        $message = new Message($message, $this);
         $attachment = [
-            'fallback' => $this->encodeMessage($this->formatMessage($message)),
-            'title' => ucwords(Logger::getLevelName($level)),
-            'fields' => [
-                [
-                    'title' => 'Level',
-                    'value' => Logger::getLevelName($level),
-                    'short' => true,
-                ],
-                [
-                    'title' => 'Category',
-                    'value' => '`' . $this->encodeMessage($category) . '`',
-                    'short' => true,
-                ],
-            ],
+            'fallback' => $this->encode($this->formatMessage($message->message)),
+            'title' => ucwords($message->getLevel()),
+            'fields' => [],
+            'text' => "```\n" . $this->encode($message->getText()) . "\n```",
             'footer' => static::className(),
-            'ts' => (int) round($timestamp),
+            'ts' => (int) round($message->getTimestamp()),
             'mrkdwn_in' => [
                 'fields',
                 'text',
             ],
         ];
-        if (isset($this->prefix)) {
-            $attachment['fields'][] = [
-                'title' => 'Prefix',
-                'value' => '`' . $this->encodeMessage(call_user_func($this->prefix, $message)) . '`',
-                'short' => true,
-            ];
+        if ($message->getIsConsoleRequest()) {
+            $attachment['author_name'] = $message->getCommandLine();
+        } else {
+            $attachment['author_name'] = $attachment['author_link'] = $message->getUrl();
         }
-        if (isset(\Yii::$app)) {
-            $this->insertRequestIntoAttachment($attachment);
-            $this->insertUserIntoAttachment($attachment);
-            $this->insertSessionIntoAttachment($attachment);
+        if (isset($this->colors[$message->message[1]])) {
+            $attachment['color'] = $this->colors[$message->message[1]];
         }
-        if (isset($this->colors[$level])) {
-            $attachment['color'] = $this->colors[$level];
-        }
-        if (!is_string($text)) {
-            if ($text instanceof \Throwable || $text instanceof \Exception) {
-                $text = (string) $text;
-            } else {
-                $text = VarDumper::export($text);
-            }
-        }
-        $attachment['text'] = "```\n" . $this->encodeMessage($text) . "\n```";
-        if (isset($message[4]) && !empty($message[4])) {
-            $this->insertTracesIntoAttachment($message[4], $attachment);
-        }
+        $this
+            ->insertField($attachment, 'Level', $message->getLevel(), true, false)
+            ->insertField($attachment, 'Category', $message->getCategory(), true)
+            ->insertField($attachment, 'Prefix', $message->getPrefix(), true)
+            ->insertField($attachment, 'User IP', $message->getUserIp(), true, false)
+            ->insertField($attachment, 'User ID', $message->getUserId(), true, false)
+            ->insertField($attachment, 'Session ID', $message->getSessionId(), true)
+            ->insertField($attachment, 'Stack Trace', $message->getStackTrace(), false);
         return $attachment;
     }
 
     /**
-     * Inserts session data into the attachement if applicable.
-     *
+     * Inserts the new attachment field if the value is not empty.
      * @param array $attachment
+     * @param string $title
+     * @param string|null $value
+     * @param bool $short
+     * @param bool $encodeValue
+     * @return $this
      */
-    private function insertSessionIntoAttachment(array &$attachment)
+    private function insertField(array &$attachment, $title, $value, $short, $encodeValue = true)
     {
-        if (
-            \Yii::$app->has('session', true)
-            && !is_null(\Yii::$app->getSession())
-            && \Yii::$app->getSession()->getIsActive()
-        ) {
-            $attachment['fields'][] = [
-                'title' => 'Session ID',
-                'value' => '`' . $this->encodeMessage(\Yii::$app->getSession()->getId()) . '`',
-                'short' => true,
-            ];
+        if ((string) $value === '') {
+            return $this;
         }
-    }
 
-    /**
-     * Inserts traces into the attachement if applicable.
-     *
-     * @param array $traces
-     * @param array $attachment
-     */
-    private function insertTracesIntoAttachment(array $traces, array &$attachment)
-    {
-        $traces = array_map(function ($trace) {
-            return "in {$trace['file']}:{$trace['line']}";
-        }, $traces);
-        $attachment['fields'][] = [
-            'title' => 'Stack Trace',
-            'value' => "```\n" . $this->encodeMessage(implode("\n", $traces)) . "\n```",
-            'short' => false,
-        ];
-    }
-
-    /**
-     * Inserts user data into the attachement if applicable.
-     *
-     * @param array $attachment
-     */
-    private function insertUserIntoAttachment(array &$attachment)
-    {
-        if (\Yii::$app->has('user', true) && !is_null(\Yii::$app->getUser())) {
-            $user = \Yii::$app->getUser()->getIdentity(false);
-            if (isset($user)) {
-                $attachment['fields'][] = [
-                    'title' => 'User ID',
-                    'value' => $this->encodeMessage($user->getId()),
-                    'short' => true,
-                ];
-            }
-        }
-    }
-
-    /**
-     * Inserts request data into the attachement if applicable.
-     *
-     * @param array $attachment
-     */
-    private function insertRequestIntoAttachment(array &$attachment)
-    {
-        if (\Yii::$app->getRequest() instanceof Request) {
-            $attachment['author_name'] = $attachment['author_link'] = Url::current([], true);
-            $attachment['fields'][] = [
-                'title' => 'User IP',
-                'value' => \Yii::$app->getRequest()->getUserIP(),
-                'short' => true,
-            ];
-        } else {
-            if (isset($_SERVER['argv'])) {
-                $params = $_SERVER['argv'];
+        if ($encodeValue) {
+            $value = $this->encode($value);
+            if ($short) {
+                $value = '`' . $value . '`';
             } else {
-                $params = [];
+                $value = "```\n" . $value . "\n```";
             }
-            $attachment['author_name'] = implode(' ', $params);
         }
+        $attachment['fields'][] = [
+            'title' => $title,
+            'value' => $value,
+            'short' => $short,
+        ];
+        return $this;
     }
 
     /**
      * Copies the value to the payload if the value is set.
-     *
      * @param array $payload
      * @param string $name
      * @param string $value
+     * @return $this
      */
     private function insertIntoPayload(array &$payload, $name, $value)
     {
-        if (isset($value)) {
+        if ((string) $value !== '') {
             $payload[$name] = $value;
         }
+        return $this;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\mocks;
+namespace sergeymakinen\tests\log\helpers;
 
 class Matches implements Tester
 {
@@ -10,7 +10,7 @@ class Matches implements Tester
     private $_regEx;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function __construct($regEx)
     {

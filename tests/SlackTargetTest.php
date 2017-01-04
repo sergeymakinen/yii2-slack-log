@@ -2,46 +2,21 @@
 
 namespace sergeymakinen\tests\log;
 
-use sergeymakinen\tests\log\mocks\Contains;
-use sergeymakinen\tests\log\mocks\Matches;
-use sergeymakinen\tests\log\mocks\TestController;
-use sergeymakinen\tests\log\mocks\Tester;
-use sergeymakinen\tests\log\mocks\TestException;
+use sergeymakinen\tests\log\helpers\Contains;
+use sergeymakinen\tests\log\helpers\Matches;
+use sergeymakinen\tests\log\helpers\Tester;
+use sergeymakinen\tests\log\stubs\TestController;
+use sergeymakinen\tests\log\stubs\TestException;
 use yii\base\ErrorHandler;
 use yii\helpers\Url;
 use yii\helpers\VarDumper;
+use yii\httpclient\Client;
+use yii\httpclient\Request;
+use yii\httpclient\Response;
 use yii\log\Logger;
 
 class SlackTargetTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
-        $this->createWebApplication([
-            'components' => [
-                'log' => $this->getLogConfig(),
-                'session' => [
-                    'class' => 'sergeymakinen\tests\log\mocks\TestSession',
-                ],
-                'user' => [
-                    'class' => 'sergeymakinen\tests\log\mocks\TestUser',
-                    'identityClass' => 'sergeymakinen\tests\log\mocks\TestIdentity',
-                ],
-            ],
-        ]);
-        \Yii::$app->controller = new TestController('test', \Yii::$app);
-        \Yii::$app->session->isActive;
-        \Yii::$app->user->getIdentity();
-    }
-
-    protected function tearDown()
-    {
-        \Yii::$app->log->targets['slack']->messages = [];
-        \Yii::$app->log->logger->messages = [];
-        parent::tearDown();
-    }
-
     public function testEncodeMessage()
     {
         $this->assertEquals('Hello &amp; &lt;world&gt; 🌊', $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'encodeMessage', ['Hello & <world> 🌊']));
@@ -55,7 +30,7 @@ class SlackTargetTest extends TestCase
                 [
                     'fallback' => new Contains([
                         'foo[error][sergeymakinen\tests\log\SlackTargetTest::testGetPayload]',
-                        'sergeymakinen\tests\log\mocks\TestException',
+                        'sergeymakinen\tests\log\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
                         '[internal function]: sergeymakinen\tests\log\SlackTargetTest-&gt;testGetPayload()',
                     ]),
@@ -102,7 +77,7 @@ class SlackTargetTest extends TestCase
                     'author_link' => Url::current([], true),
                     'color' => 'danger',
                     'text' => new Contains([
-                        'sergeymakinen\tests\log\mocks\TestException',
+                        'sergeymakinen\tests\log\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
                     ]),
                 ],
@@ -168,32 +143,6 @@ class SlackTargetTest extends TestCase
         $this->assertEquals($emptyArray, $actualArray);
     }
 
-    public function testInsertRequestIntoAttachment()
-    {
-        $attachment = [];
-        $this->createConsoleApplication([
-            'components' => [
-                'log' => $this->getLogConfig(),
-            ],
-        ]);
-
-        $_SERVER['argv'] = [
-            'cmd',
-            '--arg1',
-            'arg2',
-        ];
-        $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'insertRequestIntoAttachment', [&$attachment]);
-        $this->assertEquals([
-            'author_name' => 'cmd --arg1 arg2',
-        ], $attachment);
-
-        $_SERVER['argv'] = null;
-        $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'insertRequestIntoAttachment', [&$attachment]);
-        $this->assertEquals([
-            'author_name' => '',
-        ], $attachment);
-    }
-
     public function testFormatMessageAttachment()
     {
         $now = microtime(true);
@@ -201,16 +150,16 @@ class SlackTargetTest extends TestCase
             return isset($trace['file']);
         });
         $attachment = $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'formatMessageAttachment', [[
-            0 => new TestException('bar'),
-            1 => Logger::LEVEL_TRACE,
-            2 => 'category',
-            3 => $now,
-            4 => $trace,
+            new TestException('bar'),
+            Logger::LEVEL_TRACE,
+            'category',
+            $now,
+            $trace,
         ]]);
         $expected = [
             'fallback' => new Contains([
                 'foo[trace][category]',
-                'sergeymakinen\tests\log\mocks\TestException',
+                'sergeymakinen\tests\log\stubs\TestException',
                 'bar',
             ]),
             'title' => 'Trace',
@@ -260,7 +209,7 @@ class SlackTargetTest extends TestCase
             'author_link' => Url::current([], true),
             'author_name' => Url::current([], true),
             'text' => new Contains([
-                'sergeymakinen\tests\log\mocks\TestException',
+                'sergeymakinen\tests\log\stubs\TestException',
                 'bar',
             ]),
         ];
@@ -268,16 +217,75 @@ class SlackTargetTest extends TestCase
         $emptyArray = '[]';
         $actualArray = VarDumper::export($attachment);
         $this->assertEquals($emptyArray, $actualArray);
+
+        $this->tearDown();
+        $this->createConsoleApplication([
+            'components' => [
+                'log' => $this->getLogConfig(),
+            ],
+        ]);
+        $attachment = $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'formatMessageAttachment', [[
+            new TestException('bar'),
+            Logger::LEVEL_TRACE,
+            'category',
+            $now,
+            $trace,
+        ]]);
+        $this->assertSame(implode(' ', $_SERVER['argv']), $attachment['author_name']);
+    }
+
+    protected function mockClient($success)
+    {
+        $response = $this->createMock(Response::className());
+        if ($success) {
+            $response
+                ->method('getIsOk')
+                ->willReturn(true);
+            $response
+                ->method('getContent')
+                ->willReturn('success');
+            $response
+                ->method('getStatusCode')
+                ->willReturn(200);
+        } else {
+            $response
+                ->method('getIsOk')
+                ->willReturn(false);
+            $response
+                ->method('getContent')
+                ->willReturn('error');
+            $response
+                ->method('getStatusCode')
+                ->willReturn(404);
+        }
+        $request = $this->createMock(Request::className());
+        $request
+            ->method('send')
+            ->willReturn($response);
+        $client = $this->createMock(Client::className());
+        $client
+            ->method('post')
+            ->willReturn($request);
+        return $client;
+    }
+
+    public function testExportOk()
+    {
+        \Yii::error(ErrorHandler::convertExceptionToString(new TestException('Hello & <world> 🌊')), __METHOD__);
+        \Yii::$app->log->logger->flush();
+        \Yii::$app->log->targets['slack']->httpClient = $this->mockClient(true);
+        \Yii::$app->log->targets['slack']->export();
     }
 
     /**
      * @expectedException \yii\base\InvalidValueException
      * @expectedExceptionCode 404
      */
-    public function testExport()
+    public function testExportError()
     {
         \Yii::error(ErrorHandler::convertExceptionToString(new TestException('Hello & <world> 🌊')), __METHOD__);
         \Yii::$app->log->logger->flush();
+        \Yii::$app->log->targets['slack']->httpClient = $this->mockClient(false);
         \Yii::$app->log->targets['slack']->export();
     }
 
@@ -306,6 +314,34 @@ class SlackTargetTest extends TestCase
                 unset($actualParent[$actualKey]);
             }
         }
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
+        $this->createWebApplication([
+            'components' => [
+                'log' => $this->getLogConfig(),
+                'session' => [
+                    'class' => 'sergeymakinen\tests\log\stubs\TestSession',
+                ],
+                'user' => [
+                    'class' => 'sergeymakinen\tests\log\stubs\TestUser',
+                    'identityClass' => 'sergeymakinen\tests\log\stubs\TestIdentity',
+                ],
+            ],
+        ]);
+        \Yii::$app->controller = new TestController('test', \Yii::$app);
+        \Yii::$app->session->isActive;
+        \Yii::$app->user->getIdentity();
+    }
+
+    protected function tearDown()
+    {
+        \Yii::$app->log->targets['slack']->messages = [];
+        \Yii::$app->log->logger->messages = [];
+        parent::tearDown();
     }
 
     protected function getLogConfig()

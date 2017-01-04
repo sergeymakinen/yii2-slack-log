@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\mocks;
+namespace sergeymakinen\tests\log\helpers;
 
 class Contains implements Tester
 {
@@ -10,7 +10,7 @@ class Contains implements Tester
     private $_strings;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function __construct($strings)
     {

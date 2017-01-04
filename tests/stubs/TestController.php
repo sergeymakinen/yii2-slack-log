@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\mocks;
+namespace sergeymakinen\tests\log\stubs;
 
 use yii\web\Controller;
 

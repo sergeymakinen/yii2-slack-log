@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\mocks;
+namespace sergeymakinen\tests\log\stubs;
 
 class TestException extends \RuntimeException
 {
