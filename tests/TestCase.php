@@ -11,11 +11,14 @@ abstract class TestCase extends \sergeymakinen\tests\TestCase
      */
     protected function createMock($originalClassName)
     {
-        return $this->getMockBuilder($originalClassName)
+        $mock = $this
+            ->getMockBuilder($originalClassName)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
-            ->getMock();
+            ->disableArgumentCloning();
+        if (method_exists($mock, 'disallowMockingUnknownTypes')) {
+            $mock->disallowMockingUnknownTypes();
+        }
+        return $mock->getMock();
     }
 }
