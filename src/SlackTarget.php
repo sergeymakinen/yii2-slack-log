@@ -11,7 +11,6 @@ namespace sergeymakinen\log;
 
 use yii\base\InvalidValueException;
 use yii\di\Instance;
-use yii\helpers\Json;
 use yii\httpclient\Client;
 use yii\log\Logger;
 use yii\log\Target;
@@ -79,11 +78,10 @@ class SlackTarget extends Target
      */
     public function export()
     {
-        $response = $this->httpClient->post(
-            $this->webhookUrl,
-            Json::encode($this->getPayload()),
-            ['Content-Type: application/json; charset=UTF-8']
-        )->send();
+        $response = $this->httpClient
+            ->post($this->webhookUrl, $this->getPayload())
+            ->setFormat(Client::FORMAT_JSON)
+            ->send();
         if (!$response->getIsOk()) {
             throw new InvalidValueException(
                 'Unable to send logs to Slack: ' . $response->getContent(), (int) $response->getStatusCode()
@@ -167,7 +165,7 @@ class SlackTarget extends Target
             ->insertField($attachment, 'Prefix', $message->getPrefix(), true)
             ->insertField($attachment, 'User IP', $message->getUserIp(), true, false)
             ->insertField($attachment, 'User ID', $message->getUserId(), true, false)
-            ->insertField($attachment, 'Session ID', $message->getSessionId(), true)
+            ->insertField($attachment, 'Session ID', $message->getSessionId(), true, false)
             ->insertField($attachment, 'Stack Trace', $message->getStackTrace(), false);
         return $attachment;
     }
@@ -178,17 +176,17 @@ class SlackTarget extends Target
      * @param string $title
      * @param string|null $value
      * @param bool $short
-     * @param bool $encodeValue
+     * @param bool $wrapAsCode
      * @return $this
      */
-    private function insertField(array &$attachment, $title, $value, $short, $encodeValue = true)
+    private function insertField(array &$attachment, $title, $value, $short, $wrapAsCode = true)
     {
         if ((string) $value === '') {
             return $this;
         }
 
-        if ($encodeValue) {
-            $value = $this->encode($value);
+        $value = $this->encode($value);
+        if ($wrapAsCode) {
             if ($short) {
                 $value = '`' . $value . '`';
             } else {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7914d7cce4d17248b3de2809d15df308",
+    "content-hash": "7bf475d786800f126cd112ba2967857d",
     "packages": [
         {
             "name": "bower-asset/jquery",
@@ -1627,22 +1627,22 @@
         },
         {
             "name": "sergeymakinen/yii2-tests",
-            "version": "v1.0.2",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sergeymakinen/yii2-tests.git",
-                "reference": "05b16b34109dd06f45791bb8303c36193dccae6c"
+                "reference": "3e405a6fced4aa7cbfcd325a7547e593dcabf9a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sergeymakinen/yii2-tests/zipball/05b16b34109dd06f45791bb8303c36193dccae6c",
-                "reference": "05b16b34109dd06f45791bb8303c36193dccae6c",
+                "url": "https://api.github.com/repos/sergeymakinen/yii2-tests/zipball/3e405a6fced4aa7cbfcd325a7547e593dcabf9a9",
+                "reference": "3e405a6fced4aa7cbfcd325a7547e593dcabf9a9",
                 "shasum": ""
             },
             "require": {
                 "phpunit/phpunit": "^4.8 || ^5.6",
                 "symfony/var-dumper": "^2.8 || ^3.2",
-                "yiisoft/yii2": "~2.0.1"
+                "yiisoft/yii2": "~2.0.2"
             },
             "type": "library",
             "autoload": {
@@ -1670,7 +1670,7 @@
                 "yii2",
                 "yii2-tests"
             ],
-            "time": "2016-12-03T19:22:16+00:00"
+            "time": "2017-01-05T14:12:24+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",

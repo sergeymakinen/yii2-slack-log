@@ -1,12 +1,12 @@
 <?php
 
-namespace sergeymakinen\tests\log;
+namespace sergeymakinen\tests\slacklog;
 
-use sergeymakinen\tests\log\helpers\Contains;
-use sergeymakinen\tests\log\helpers\Matches;
-use sergeymakinen\tests\log\helpers\Tester;
-use sergeymakinen\tests\log\stubs\TestController;
-use sergeymakinen\tests\log\stubs\TestException;
+use sergeymakinen\tests\slacklog\helpers\Contains;
+use sergeymakinen\tests\slacklog\helpers\Matches;
+use sergeymakinen\tests\slacklog\helpers\Tester;
+use sergeymakinen\tests\slacklog\stubs\TestController;
+use sergeymakinen\tests\slacklog\stubs\TestException;
 use yii\base\ErrorHandler;
 use yii\helpers\Url;
 use yii\helpers\VarDumper;
@@ -29,10 +29,10 @@ class SlackTargetTest extends TestCase
             'attachments' => [
                 [
                     'fallback' => new Contains([
-                        'foo[error][sergeymakinen\tests\log\SlackTargetTest::testGetPayload]',
-                        'sergeymakinen\tests\log\stubs\TestException',
+                        '&lt;foo&gt;[error][sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload]',
+                        'sergeymakinen\tests\slacklog\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
-                        '[internal function]: sergeymakinen\tests\log\SlackTargetTest-&gt;testGetPayload()',
+                        '[internal function]: sergeymakinen\tests\slacklog\SlackTargetTest-&gt;testGetPayload()',
                     ]),
                     'title' => 'Error',
                     'fields' => [
@@ -43,12 +43,12 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'Category',
-                            'value' => '`sergeymakinen\tests\log\SlackTargetTest::testGetPayload`',
+                            'value' => '`sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload`',
                             'short' => true,
                         ],
                         [
                             'title' => 'Prefix',
-                            'value' => '`foo`',
+                            'value' => '`&lt;foo&gt;`',
                             'short' => true,
                         ],
                         [
@@ -58,12 +58,12 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'User ID',
-                            'value' => 'userId',
+                            'value' => '&lt;userId&gt;',
                             'short' => true,
                         ],
                         [
                             'title' => 'Session ID',
-                            'value' => '`session_id`',
+                            'value' => '&lt;session_id&gt;',
                             'short' => true,
                         ],
                     ],
@@ -77,13 +77,13 @@ class SlackTargetTest extends TestCase
                     'author_link' => Url::current([], true),
                     'color' => 'danger',
                     'text' => new Contains([
-                        'sergeymakinen\tests\log\stubs\TestException',
+                        'sergeymakinen\tests\slacklog\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
                     ]),
                 ],
                 [
                     'fallback' => new Contains([
-                        'foo[info][sergeymakinen\tests\log\SlackTargetTest::testGetPayload]',
+                        '&lt;foo&gt;[info][sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload]',
                         'bar',
                     ]),
                     'title' => 'Info',
@@ -95,12 +95,12 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'Category',
-                            'value' => '`sergeymakinen\tests\log\SlackTargetTest::testGetPayload`',
+                            'value' => '`sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload`',
                             'short' => true,
                         ],
                         [
                             'title' => 'Prefix',
-                            'value' => '`foo`',
+                            'value' => '`&lt;foo&gt;`',
                             'short' => true,
                         ],
                         [
@@ -110,12 +110,12 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'User ID',
-                            'value' => 'userId',
+                            'value' => '&lt;userId&gt;',
                             'short' => true,
                         ],
                         [
                             'title' => 'Session ID',
-                            'value' => '`session_id`',
+                            'value' => '&lt;session_id&gt;',
                             'short' => true,
                         ],
                     ],
@@ -152,14 +152,14 @@ class SlackTargetTest extends TestCase
         $attachment = $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'formatMessageAttachment', [[
             new TestException('bar'),
             Logger::LEVEL_TRACE,
-            'category',
+            '<category>',
             $now,
             $trace,
         ]]);
         $expected = [
             'fallback' => new Contains([
-                'foo[trace][category]',
-                'sergeymakinen\tests\log\stubs\TestException',
+                '&lt;foo&gt;[trace][&lt;category&gt;]',
+                'sergeymakinen\tests\slacklog\stubs\TestException',
                 'bar',
             ]),
             'title' => 'Trace',
@@ -171,12 +171,12 @@ class SlackTargetTest extends TestCase
                 ],
                 [
                     'title' => 'Category',
-                    'value' => '`category`',
+                    'value' => '`&lt;category&gt;`',
                     'short' => true,
                 ],
                 [
                     'title' => 'Prefix',
-                    'value' => '`foo`',
+                    'value' => '`&lt;foo&gt;`',
                     'short' => true,
                 ],
                 [
@@ -186,12 +186,12 @@ class SlackTargetTest extends TestCase
                 ],
                 [
                     'title' => 'User ID',
-                    'value' => 'userId',
+                    'value' => '&lt;userId&gt;',
                     'short' => true,
                 ],
                 [
                     'title' => 'Session ID',
-                    'value' => '`session_id`',
+                    'value' => '&lt;session_id&gt;',
                     'short' => true,
                 ],
                 [
@@ -209,7 +209,7 @@ class SlackTargetTest extends TestCase
             'author_link' => Url::current([], true),
             'author_name' => Url::current([], true),
             'text' => new Contains([
-                'sergeymakinen\tests\log\stubs\TestException',
+                'sergeymakinen\tests\slacklog\stubs\TestException',
                 'bar',
             ]),
         ];
@@ -260,6 +260,9 @@ class SlackTargetTest extends TestCase
         }
         $request = $this->createMock(Request::className());
         $request
+            ->method('setFormat')
+            ->willReturnSelf();
+        $request
             ->method('send')
             ->willReturn($response);
         $client = $this->createMock(Client::className());
@@ -267,6 +270,21 @@ class SlackTargetTest extends TestCase
             ->method('post')
             ->willReturn($request);
         return $client;
+    }
+
+    public function testExportReal()
+    {
+        $configPath = \Yii::getAlias('@tests/config-local.php');
+        if (!is_file($configPath)) {
+            $this->markTestSkipped('No config file: ' . $configPath);
+            return;
+        }
+
+        $config = require $configPath;
+        \Yii::error(ErrorHandler::convertExceptionToString(new TestException('Hello & <world> 🌊')), __METHOD__);
+        \Yii::$app->log->logger->flush();
+        \Yii::$app->log->targets['slack']->webhookUrl = $config['webhookUrl'];
+        \Yii::$app->log->targets['slack']->export();
     }
 
     public function testExportOk()
@@ -324,11 +342,11 @@ class SlackTargetTest extends TestCase
             'components' => [
                 'log' => $this->getLogConfig(),
                 'session' => [
-                    'class' => 'sergeymakinen\tests\log\stubs\TestSession',
+                    'class' => 'sergeymakinen\tests\slacklog\stubs\TestSession',
                 ],
                 'user' => [
-                    'class' => 'sergeymakinen\tests\log\stubs\TestUser',
-                    'identityClass' => 'sergeymakinen\tests\log\stubs\TestIdentity',
+                    'class' => 'sergeymakinen\tests\slacklog\stubs\TestUser',
+                    'identityClass' => 'sergeymakinen\tests\slacklog\stubs\TestIdentity',
                 ],
             ],
         ]);
@@ -358,7 +376,7 @@ class SlackTargetTest extends TestCase
                     'username' => 'Fire Alarm Bot',
                     'iconEmoji' => ':poop:',
                     'prefix' => function () {
-                        return 'foo';
+                        return '<foo>';
                     },
                     'logVars' => [],
                 ],

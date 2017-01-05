@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\stubs;
+namespace sergeymakinen\tests\slacklog\stubs;
 
 use yii\web\Session;
 
@@ -19,6 +19,6 @@ class TestSession extends Session
      */
     public function getId()
     {
-        return 'session_id';
+        return '<session_id>';
     }
 }

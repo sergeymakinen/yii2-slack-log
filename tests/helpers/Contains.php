@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\helpers;
+namespace sergeymakinen\tests\slacklog\helpers;
 
 class Contains implements Tester
 {

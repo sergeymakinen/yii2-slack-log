@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\log\stubs;
+namespace sergeymakinen\tests\slacklog\stubs;
 
 use yii\base\InvalidCallException;
 use yii\web\IdentityInterface;
@@ -28,7 +28,7 @@ class TestIdentity implements IdentityInterface
      */
     public function getId()
     {
-        return 'userId';
+        return '<userId>';
     }
 
     /**
