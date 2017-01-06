@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f709b8b3b7492a25675d3eac34b2e03e",
+    "content-hash": "7bf475d786800f126cd112ba2967857d",
     "packages": [
         {
             "name": "bower-asset/jquery",
@@ -182,7 +182,7 @@
         },
         {
             "name": "sergeymakinen/yii2-log-message",
-            "version": "v1.1.0",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sergeymakinen/yii2-log-message.git",
