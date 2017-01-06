@@ -156,12 +156,17 @@ class SlackTargetTest extends TestCase
             $now,
             $trace,
         ]]);
-        $expected = [
-            'fallback' => new Contains([
+        if (version_compare(\Yii::getVersion(), '2.0.7', '>=')) {
+            $fallbackStrings = [
                 '&lt;foo&gt;[trace][&lt;category&gt;]',
                 'sergeymakinen\tests\slacklog\stubs\TestException',
                 'bar',
-            ]),
+            ];
+        } else {
+            $fallbackStrings = ['bar'];
+        }
+        $expected = [
+            'fallback' => new Contains($fallbackStrings),
             'title' => 'Trace',
             'fields' => [
                 [
@@ -281,7 +286,7 @@ class SlackTargetTest extends TestCase
         }
 
         $config = require $configPath;
-        \Yii::error(ErrorHandler::convertExceptionToString(new TestException('Hello & <world> 🌊')), __METHOD__);
+        \Yii::error('It happened again...', __METHOD__);
         \Yii::$app->log->logger->flush();
         \Yii::$app->log->targets['slack']->webhookUrl = $config['webhookUrl'];
         \Yii::$app->log->targets['slack']->export();
