@@ -7,15 +7,18 @@
  * @license   https://github.com/sergeymakinen/yii2-slack-log/blob/master/LICENSE MIT License
  */
 
-namespace sergeymakinen\log;
+namespace sergeymakinen\yii\slacklog;
 
+use sergeymakinen\yii\logmessage\Message;
 use yii\base\InvalidValueException;
 use yii\di\Instance;
 use yii\httpclient\Client;
 use yii\log\Logger;
-use yii\log\Target;
 
-class SlackTarget extends Target
+/**
+ * This class implements logging to Slack channels via incoming webhooks.
+ */
+class Target extends \yii\log\Target
 {
     /**
      * @var Client|array|string Yii HTTP client configuration.
@@ -75,6 +78,7 @@ class SlackTarget extends Target
 
     /**
      * @inheritDoc
+     * @throws \yii\base\InvalidValueException
      */
     public function export()
     {
@@ -90,18 +94,6 @@ class SlackTarget extends Target
     }
 
     /**
-     * Encodes special chars in a message as HTML entities.
-     * @param string $message
-     * @return string
-     * @deprecated 1.3
-     * @see encode()
-     */
-    protected function encodeMessage($message)
-    {
-        return $this->encode($message);
-    }
-
-    /**
      * Encodes special chars in a string as HTML entities.
      * @param string $string
      * @return string
@@ -114,7 +106,7 @@ class SlackTarget extends Target
 
     /**
      * Returns a Slack API payload.
-     * @return array
+     * @return array payload.
      * @since 1.2
      */
     protected function getPayload()
@@ -133,8 +125,8 @@ class SlackTarget extends Target
 
     /**
      * Returns a properly formatted message attachment for Slack API.
-     * @param array $message
-     * @return array
+     * @param array $message raw message.
+     * @return array Slack message attachment.
      */
     protected function formatMessageAttachment($message)
     {
@@ -144,7 +136,7 @@ class SlackTarget extends Target
             'title' => ucwords($message->getLevel()),
             'fields' => [],
             'text' => "```\n" . $this->encode($message->getText()) . "\n```",
-            'footer' => static::className(),
+            'footer' => \Yii::$app->id,
             'ts' => (int) round($message->getTimestamp()),
             'mrkdwn_in' => [
                 'fields',

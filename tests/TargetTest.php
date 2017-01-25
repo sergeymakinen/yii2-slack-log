@@ -1,12 +1,16 @@
 <?php
 
-namespace sergeymakinen\tests\slacklog;
+namespace sergeymakinen\yii\slacklog\tests;
 
-use sergeymakinen\tests\slacklog\helpers\Contains;
-use sergeymakinen\tests\slacklog\helpers\Matches;
-use sergeymakinen\tests\slacklog\helpers\Tester;
-use sergeymakinen\tests\slacklog\stubs\TestController;
-use sergeymakinen\tests\slacklog\stubs\TestException;
+use sergeymakinen\yii\slacklog\Target;
+use sergeymakinen\yii\slacklog\tests\helpers\Contains;
+use sergeymakinen\yii\slacklog\tests\helpers\Matches;
+use sergeymakinen\yii\slacklog\tests\helpers\Tester;
+use sergeymakinen\yii\slacklog\tests\stubs\TestController;
+use sergeymakinen\yii\slacklog\tests\stubs\TestException;
+use sergeymakinen\yii\slacklog\tests\stubs\TestIdentity;
+use sergeymakinen\yii\slacklog\tests\stubs\TestSession;
+use sergeymakinen\yii\slacklog\tests\stubs\TestUser;
 use yii\base\ErrorHandler;
 use yii\helpers\Url;
 use yii\helpers\VarDumper;
@@ -15,11 +19,11 @@ use yii\httpclient\Request;
 use yii\httpclient\Response;
 use yii\log\Logger;
 
-class SlackTargetTest extends TestCase
+class TargetTest extends TestCase
 {
-    public function testEncodeMessage()
+    public function testEncode()
     {
-        $this->assertEquals('Hello &amp; &lt;world&gt; 🌊', $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'encodeMessage', ['Hello & <world> 🌊']));
+        $this->assertEquals('Hello &amp; &lt;world&gt; 🌊', $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'encode', ['Hello & <world> 🌊']));
     }
 
     public function testGetPayload()
@@ -29,10 +33,10 @@ class SlackTargetTest extends TestCase
             'attachments' => [
                 [
                     'fallback' => new Contains([
-                        '&lt;foo&gt;[error][sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload]',
-                        'sergeymakinen\tests\slacklog\stubs\TestException',
+                        '&lt;foo&gt;[error][sergeymakinen\yii\slacklog\tests\TargetTest::testGetPayload]',
+                        'sergeymakinen\yii\slacklog\tests\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
-                        '[internal function]: sergeymakinen\tests\slacklog\SlackTargetTest-&gt;testGetPayload()',
+                        '[internal function]: sergeymakinen\yii\slacklog\tests\TargetTest-&gt;testGetPayload()',
                     ]),
                     'title' => 'Error',
                     'fields' => [
@@ -43,7 +47,7 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'Category',
-                            'value' => '`sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload`',
+                            'value' => '`sergeymakinen\yii\slacklog\tests\TargetTest::testGetPayload`',
                             'short' => true,
                         ],
                         [
@@ -67,7 +71,7 @@ class SlackTargetTest extends TestCase
                             'short' => true,
                         ],
                     ],
-                    'footer' => 'sergeymakinen\log\SlackTarget',
+                    'footer' => 'web-test',
                     'ts' => new Matches('/[0-9]+/'),
                     'mrkdwn_in' => [
                         'fields',
@@ -77,13 +81,13 @@ class SlackTargetTest extends TestCase
                     'author_link' => Url::current([], true),
                     'color' => 'danger',
                     'text' => new Contains([
-                        'sergeymakinen\tests\slacklog\stubs\TestException',
+                        'sergeymakinen\yii\slacklog\tests\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
                     ]),
                 ],
                 [
                     'fallback' => new Contains([
-                        '&lt;foo&gt;[info][sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload]',
+                        '&lt;foo&gt;[info][sergeymakinen\yii\slacklog\tests\TargetTest::testGetPayload]',
                         'bar',
                     ]),
                     'title' => 'Info',
@@ -95,7 +99,7 @@ class SlackTargetTest extends TestCase
                         ],
                         [
                             'title' => 'Category',
-                            'value' => '`sergeymakinen\tests\slacklog\SlackTargetTest::testGetPayload`',
+                            'value' => '`sergeymakinen\yii\slacklog\tests\TargetTest::testGetPayload`',
                             'short' => true,
                         ],
                         [
@@ -119,7 +123,7 @@ class SlackTargetTest extends TestCase
                             'short' => true,
                         ],
                     ],
-                    'footer' => 'sergeymakinen\log\SlackTarget',
+                    'footer' => 'web-test',
                     'ts' => new Matches('/[0-9]+/'),
                     'mrkdwn_in' => [
                         'fields',
@@ -159,7 +163,7 @@ class SlackTargetTest extends TestCase
         if (version_compare(\Yii::getVersion(), '2.0.7', '>=')) {
             $fallbackStrings = [
                 '&lt;foo&gt;[trace][&lt;category&gt;]',
-                'sergeymakinen\tests\slacklog\stubs\TestException',
+                'sergeymakinen\yii\slacklog\tests\stubs\TestException',
                 'bar',
             ];
         } else {
@@ -205,7 +209,7 @@ class SlackTargetTest extends TestCase
                     'short' => false,
                 ],
             ],
-            'footer' => 'sergeymakinen\log\SlackTarget',
+            'footer' => 'web-test',
             'ts' => (string) (int) round($now),
             'mrkdwn_in' => [
                 'fields',
@@ -214,7 +218,7 @@ class SlackTargetTest extends TestCase
             'author_link' => Url::current([], true),
             'author_name' => Url::current([], true),
             'text' => new Contains([
-                'sergeymakinen\tests\slacklog\stubs\TestException',
+                'sergeymakinen\yii\slacklog\tests\stubs\TestException',
                 'bar',
             ]),
         ];
@@ -347,11 +351,11 @@ class SlackTargetTest extends TestCase
             'components' => [
                 'log' => $this->getLogConfig(),
                 'session' => [
-                    'class' => 'sergeymakinen\tests\slacklog\stubs\TestSession',
+                    'class' => TestSession::className(),
                 ],
                 'user' => [
-                    'class' => 'sergeymakinen\tests\slacklog\stubs\TestUser',
-                    'identityClass' => 'sergeymakinen\tests\slacklog\stubs\TestIdentity',
+                    'class' => TestUser::className(),
+                    'identityClass' => TestIdentity::className(),
                 ],
             ],
         ]);
@@ -372,10 +376,10 @@ class SlackTargetTest extends TestCase
         return [
             'targets' => [
                 'slack' => [
-                    'class' => 'sergeymakinen\log\SlackTarget',
+                    'class' => Target::className(),
                     'levels' => ['error', 'info'],
                     'categories' => [
-                        'sergeymakinen\tests\*',
+                        __NAMESPACE__ . '\*',
                     ],
                     'webhookUrl' => 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
                     'username' => 'Fire Alarm Bot',

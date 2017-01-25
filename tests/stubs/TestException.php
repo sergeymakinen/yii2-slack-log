@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\slacklog\stubs;
+namespace sergeymakinen\yii\slacklog\tests\stubs;
 
 class TestException extends \RuntimeException
 {

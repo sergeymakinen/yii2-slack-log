@@ -1,6 +1,6 @@
 <?php
 
-namespace sergeymakinen\tests\slacklog\helpers;
+namespace sergeymakinen\yii\slacklog\tests\helpers;
 
 class Matches implements Tester
 {

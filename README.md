@@ -15,13 +15,13 @@ The preferred way to install this extension is through [composer](https://getcom
 Either run
 
 ```bash
-composer require "sergeymakinen/yii2-slack-log:^1.0"
+composer require "sergeymakinen/yii2-slack-log:^2.0"
 ```
 
 or add
 
 ```json
-"sergeymakinen/yii2-slack-log": "^1.0"
+"sergeymakinen/yii2-slack-log": "^2.0"
 ```
 
 to the require section of your `composer.json` file.
@@ -37,7 +37,7 @@ Then set the following Yii 2 configuration parameters:
     'log' => [
         'targets' => [
             [
-                'class' => 'sergeymakinen\log\SlackTarget',
+                'class' => 'sergeymakinen\yii\slacklog\Target',
                 'webhookUrl' => 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
             ],
         ],
@@ -52,7 +52,7 @@ Sample config:
     'log' => [
         'targets' => [
             [
-                'class' => 'sergeymakinen\log\SlackTarget',
+                'class' => 'sergeymakinen\yii\slacklog\Target',
                 'levels' => ['error'],
                 'except' => [
                     'yii\web\HttpException:*',
