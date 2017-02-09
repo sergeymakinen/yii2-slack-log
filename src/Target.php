@@ -65,10 +65,15 @@ class Target extends \yii\log\Target
     /**
      * @inheritDoc
      */
-    public $exportInterval = 50;
+    public function __construct($config = [])
+    {
+        $this->exportInterval = 20;
+        parent::__construct($config);
+    }
 
     /**
      * @inheritDoc
+     * @throws \yii\base\InvalidConfigException
      */
     public function init()
     {
