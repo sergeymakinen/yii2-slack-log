@@ -2,7 +2,13 @@
 
 namespace sergeymakinen\yii\slacklog\tests\helpers;
 
+use PHPUnit\Framework\TestCase;
+
 interface Tester
 {
-    public function test(\PHPUnit_Framework_TestCase $testCase, $actual);
+    /**
+     * @param TestCase|\PHPUnit_Framework_TestCase $testCase
+     * @param mixed $actual
+     */
+    public function test($testCase, $actual);
 }

@@ -23,7 +23,7 @@
         "sergeymakinen/yii2-log-message": "^2.0"
     },
     "require-dev": {
-        "sergeymakinen/yii2-tests": "^2.0"
+        "sergeymakinen/yii2-tests": "^2.1.1"
     },
     "autoload": {
         "psr-4": {

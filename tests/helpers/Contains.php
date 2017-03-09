@@ -17,7 +17,10 @@ class Contains implements Tester
         $this->_strings = (array) $strings;
     }
 
-    public function test(\PHPUnit_Framework_TestCase $testCase, $actual)
+    /**
+     * @inheritDoc
+     */
+    public function test($testCase, $actual)
     {
         foreach ($this->_strings as $string) {
             $testCase->assertContains((string) $string, (string) $actual);

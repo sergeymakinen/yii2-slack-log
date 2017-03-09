@@ -19,13 +19,26 @@ use yii\httpclient\Request;
 use yii\httpclient\Response;
 use yii\log\Logger;
 
+/**
+ * @coversDefaultClass \sergeymakinen\yii\slacklog\Target
+ * @covers ::<private>
+ * @covers ::__construct
+ * @covers ::init
+ */
 class TargetTest extends TestCase
 {
+    /**
+     * @covers ::encode
+     */
     public function testEncode()
     {
         $this->assertEquals('Hello &amp; &lt;world&gt; 🌊', $this->invokeInaccessibleMethod(\Yii::$app->log->targets['slack'], 'encode', ['Hello & <world> 🌊']));
     }
 
+    /**
+     * @covers ::getPayload
+     * @covers ::formatMessageAttachment
+     */
     public function testGetPayload()
     {
         $expected = [
@@ -147,6 +160,9 @@ class TargetTest extends TestCase
         $this->assertEquals($emptyArray, $actualArray);
     }
 
+    /**
+     * @covers ::formatMessageAttachment
+     */
     public function testFormatMessageAttachment()
     {
         $now = microtime(true);
@@ -281,7 +297,10 @@ class TargetTest extends TestCase
         return $client;
     }
 
-    public function testExportReal()
+    /**
+     * @covers ::export
+     */
+    public function testRealExport()
     {
         $configPath = \Yii::getAlias('@tests/config-local.php');
         if (!is_file($configPath)) {
@@ -296,6 +315,9 @@ class TargetTest extends TestCase
         \Yii::$app->log->targets['slack']->export();
     }
 
+    /**
+     * @covers ::export
+     */
     public function testExportOk()
     {
         \Yii::error(ErrorHandler::convertExceptionToString(new TestException('Hello & <world> 🌊')), __METHOD__);
@@ -305,6 +327,7 @@ class TargetTest extends TestCase
     }
 
     /**
+     * @covers ::export
      * @expectedException \yii\base\InvalidValueException
      * @expectedExceptionCode 404
      */

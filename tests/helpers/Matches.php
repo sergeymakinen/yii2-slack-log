@@ -17,7 +17,10 @@ class Matches implements Tester
         $this->_regEx = (string) $regEx;
     }
 
-    public function test(\PHPUnit_Framework_TestCase $testCase, $actual)
+    /**
+     * @inheritDoc
+     */
+    public function test($testCase, $actual)
     {
         $testCase->assertRegExp($this->_regEx, (string) $actual);
     }

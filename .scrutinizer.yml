@@ -1,7 +1,7 @@
 build:
     environment:
         php:
-            version: 5.6
+            version: 7.0
     dependencies:
         before:
             - composer config -g repositories.asset-packagist composer https://asset-packagist.org
