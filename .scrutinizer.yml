@@ -8,7 +8,8 @@ build:
 imports:
     - php
 tools:
-    external_code_coverage: true
+    external_code_coverage:
+      timeout: 1800
     php_cpd: false
     php_sim: false
 filter:
