@@ -18,6 +18,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
+        "php": "^5.4 || ^7.0",
         "yiisoft/yii2": "~2.0.2",
         "yiisoft/yii2-httpclient": "~2.0.0",
         "sergeymakinen/yii2-log-message": "^2.0"
