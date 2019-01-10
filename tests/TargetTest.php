@@ -49,7 +49,7 @@ class TargetTest extends TestCase
                         '&lt;foo&gt;[error][sergeymakinen\yii\slacklog\tests\TargetTest::testGetPayload]',
                         'sergeymakinen\yii\slacklog\tests\stubs\TestException',
                         'Hello &amp; &lt;world&gt; 🌊',
-                        '[internal function]: sergeymakinen\yii\slacklog\tests\TargetTest-&gt;testGetPayload()',
+                        'sergeymakinen\yii\slacklog\tests\TargetTest-&gt;testGetPayload()',
                     ]),
                     'title' => 'Error',
                     'fields' => [
